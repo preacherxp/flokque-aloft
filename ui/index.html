@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Flokque Aloft</title>
+    <link rel="stylesheet" href="panel.css" />
+    <script src="panel.js" defer></script>
+  </head>
+  <body>
+    <main class="panel">
+      <header>
+        <img src="icon.png" alt="" width="32" height="32" />
+        <div>
+          <h1>Flokque Aloft</h1>
+          <p class="sub" id="sub"></p>
+        </div>
+      </header>
+
+      <section class="keep">
+        <div>
+          <h2 id="keep-label">Keep aloft with lid closed</h2>
+          <p id="detail"></p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="keep" role="switch" aria-labelledby="keep-label" />
+          <span></span>
+        </label>
+      </section>
+
+      <dl>
+        <div id="agents-line"><dt>Agents</dt><dd id="agents"></dd></div>
+        <div id="lid-line"><dt>Lid</dt><dd id="lid"></dd></div>
+        <div><dt>Power</dt><dd id="power"></dd></div>
+      </dl>
+
+      <hr />
+
+      <nav>
+        <button type="button" id="open">Open Flokque</button>
+        <button type="button" id="quit">Quit Flokque Aloft</button>
+      </nav>
+    </main>
+  </body>
+</html>
