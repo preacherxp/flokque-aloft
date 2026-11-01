@@ -22,7 +22,7 @@ Quitting restores sleep. Aloft turns itself off when the computer overheats
 (macOS and Linux) or, on battery, drops below 20%. The lid state shows where
 the system reports it (macOS and Linux).
 
-When [Flokque](../README.md) runs on the same computer, the panel also shows
+When Flokque, a server that runs coding agents, is on the same computer, the panel also shows
 whether it's online and how many agents it's running.
 
 ## Settings
@@ -51,10 +51,10 @@ cd aloft
 cargo tauri dev                    # run it
 cargo test                         # the parsers and safety checks
 cargo tauri build                  # .app and .dmg, .deb, .rpm and AppImage, or .msi and setup .exe
-cargo tauri build --bundles app    # just the .app, as scripts/install-launchd.sh does
+cargo tauri build --bundles app    # just the .app, as Flokque's install script does
 ```
 
 Each platform builds its own bundles; there is no cross-compiling. To start
 Aloft at login, add it to your login items (macOS), autostart (Linux) or
-startup apps (Windows); on a Mac running Flokque, `scripts/install-launchd.sh`
+startup apps (Windows); on a Mac running Flokque, its install script
 does that with a launchd agent.

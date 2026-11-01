@@ -3,6 +3,7 @@ name = "flokque-aloft"
 version = "1.0.0"
 description = "Keeps your computer working with the lid closed"
 license = "MIT"
+repository = "https://github.com/preacherxp/flokque-aloft"
 edition = "2021"
 
 [build-dependencies]
