@@ -52,6 +52,7 @@ cargo tauri dev                    # run it
 cargo test                         # the parsers and safety checks
 cargo tauri build                  # .app and .dmg, .deb, .rpm and AppImage, or .msi and setup .exe
 cargo tauri build --bundles app    # just the .app, as Flokque's install script does
+cargo tauri icon icons/icon.png    # the bundle icons, from the Flokque icon on the macOS grid
 ```
 
 Each platform builds its own bundles; there is no cross-compiling. To start
