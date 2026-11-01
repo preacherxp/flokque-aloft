@@ -33,8 +33,8 @@ struct Aloft {
     problem: Option<String>,
     readings: power::Readings,
     flokque: Option<flokque::Health>,
-    /// Flokque's name, kept while it doesn't answer.
-    server: Option<String>,
+    /// Flokque answered since Aloft started, so going quiet means it's offline.
+    flokque_seen: bool,
 }
 
 struct Tray {
@@ -55,7 +55,6 @@ struct View {
     problem: bool,
     /// "online" or "offline"; None when Flokque hasn't answered since Aloft started.
     flokque: Option<&'static str>,
-    server: Option<String>,
     agents: Option<u32>,
     lid: Option<&'static str>,
     power: String,
@@ -72,12 +71,11 @@ impl Aloft {
             on: self.hold.is_some(),
             detail,
             problem: self.problem.is_some(),
-            flokque: match (&self.flokque, &self.server) {
+            flokque: match (&self.flokque, self.flokque_seen) {
                 (Some(_), _) => Some("online"),
-                (None, Some(_)) => Some("offline"),
-                (None, None) => None,
+                (None, true) => Some("offline"),
+                (None, false) => None,
             },
-            server: self.server.clone(),
             agents: self.flokque.as_ref().map(|health| health.active_sessions),
             lid: self
                 .readings
@@ -181,11 +179,7 @@ fn check(
     let stopped = {
         let mut aloft = aloft(app);
         aloft.readings = readings;
-        if let Some(name) = health.as_ref().and_then(|health| health.name.clone()) {
-            aloft.server = Some(name);
-        } else if health.is_some() && aloft.server.is_none() {
-            aloft.server = Some("Flokque".into());
-        }
+        aloft.flokque_seen |= health.is_some();
         aloft.flokque = health;
         match unsafe_to_stay_awake(&readings, min_battery) {
             Some(reason) if aloft.hold.is_some() => {
@@ -462,7 +456,7 @@ fn main() {
                 problem: None,
                 readings: power::Readings::default(),
                 flokque: None,
-                server: None,
+                flokque_seen: false,
             }));
             app.manage(PanelHiddenAt(Mutex::new(None)));
 

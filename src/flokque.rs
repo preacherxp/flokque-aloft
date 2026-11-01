@@ -6,7 +6,6 @@ use std::time::Duration;
 #[serde(rename_all = "camelCase")]
 pub struct Health {
     pub active_sessions: u32,
-    pub name: Option<String>,
 }
 
 /// None while Flokque doesn't answer, or doesn't run here at all.

@@ -20,7 +20,7 @@ function render(view) {
   const sub = byId("sub");
 
   if (view.flokque) {
-    sub.replaceChildren(view.server, view.flokque === "online" ? pill("Online", "success") : pill("Offline", "muted"));
+    sub.replaceChildren("Flokque", view.flokque === "online" ? pill("Online", "success") : pill("Offline", "muted"));
   } else {
     sub.replaceChildren("Keeps working with the lid closed");
   }
