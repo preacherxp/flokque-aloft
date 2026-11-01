@@ -240,7 +240,7 @@ fn tray_icon(on: bool) -> Image<'static> {
             radius + menu_bar_check::GAP * per_point,
         );
         let mut rgba = bird.rgba().to_vec();
-        for (i, pixel) in rgba.chunks_exact_mut(4).enumerate() {
+        for (i, pixel) in rgba.as_chunks_mut::<4>().0.iter_mut().enumerate() {
             let (x, y) = (i as u32 % bird.width(), i as u32 / bird.width());
             if within(x, y, gap) {
                 pixel[3] = 0;
