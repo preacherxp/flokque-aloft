@@ -57,7 +57,6 @@ struct View {
     agents: Option<u32>,
     lid: Option<&'static str>,
     power: String,
-    can_open_flokque: bool,
 }
 
 impl Aloft {
@@ -94,8 +93,6 @@ impl Aloft {
                 ),
                 None => "Plugged in".into(),
             },
-            // Opens the Flokque app, which only Macs have.
-            can_open_flokque: cfg!(target_os = "macos") && self.flokque.is_some(),
         }
     }
 }
@@ -358,15 +355,6 @@ fn set_on(app: AppHandle, on: bool) {
 }
 
 #[tauri::command]
-fn open_flokque(app: AppHandle) {
-    #[cfg(target_os = "macos")]
-    let _ = std::process::Command::new("/usr/bin/open")
-        .arg("flokque://")
-        .spawn();
-    hide_panel(&app);
-}
-
-#[tauri::command]
 fn hide(app: AppHandle) {
     hide_panel(&app);
 }
@@ -397,7 +385,6 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             state,
             set_on,
-            open_flokque,
             hide,
             quit
         ])

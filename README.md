@@ -23,8 +23,7 @@ Quitting restores sleep. Aloft turns itself off when the computer overheats
 the system reports it (macOS and Linux).
 
 When [Flokque](../README.md) runs on the same computer, the panel also shows
-its name, whether it's online, and how many agents it's running; on a Mac,
-**Open Flokque** opens the Flokque app.
+its name, whether it's online, and how many agents it's running.
 
 ## Settings
 

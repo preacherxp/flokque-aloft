@@ -36,7 +36,6 @@ function render(view) {
   byId("lid-line").hidden = view.lid === null;
   byId("lid").textContent = view.lid ?? "";
   byId("power").textContent = view.power;
-  byId("open").hidden = !view.canOpenFlokque;
 
   getCurrentWindow().setSize(new LogicalSize(290, document.querySelector(".panel").offsetHeight));
 }
@@ -47,8 +46,6 @@ byId("keep").addEventListener("change", (event) => {
   event.target.checked = !on;
   invoke("set_on", { on });
 });
-
-byId("open").addEventListener("click", () => invoke("open_flokque"));
 
 byId("quit").addEventListener("click", () => invoke("quit"));
 
