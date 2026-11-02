@@ -11,7 +11,6 @@ panel, or in its tray menu.
 - **One switch.** Turn it on from the menu bar; quit, and sleep comes back.
 - **Safe by default.** It turns itself off when it's too hot or the battery runs low.
 - **Mac, Linux and Windows.** One small app, the same panel everywhere.
-- **Knows your agents.** With Flokque running, it shows how many agents are at work.
 
 ## How it works
 
@@ -32,10 +31,6 @@ Quitting restores sleep. Aloft turns itself off when the computer overheats
 (macOS and Linux) or, on battery, drops below 20%. The lid state shows where
 the system reports it (macOS and Linux).
 
-When Flokque, a server that runs coding agents, is running on the same computer,
-the panel also shows it and how many agents it's running, and on a Mac
-**Open Flokque** opens the Flokque app. Without it, neither shows.
-
 ## Settings
 
 `settings.json` in the app's config directory: `~/Library/Application
@@ -45,8 +40,7 @@ and `%APPDATA%\com.flokque.aloft\` on Windows. Aloft reads it every 10 seconds.
 ```json
 {
   "on": false,
-  "minBattery": 20,
-  "flokqueUrl": "http://127.0.0.1:4820"
+  "minBattery": 20
 }
 ```
 
@@ -62,14 +56,13 @@ cd aloft
 cargo tauri dev                    # run it
 cargo test                         # the parsers and safety checks
 cargo tauri build                  # .app and .dmg, .deb, .rpm and AppImage, or .msi and setup .exe
-cargo tauri build --bundles app    # just the .app, as Flokque's install script does
-cargo tauri icon icons/icon.png    # the bundle icons, from the Flokque icon on the macOS grid
+cargo tauri build --bundles app    # just the .app
+cargo tauri icon icons/icon.png    # the bundle icons, from the app icon on the macOS grid
 ```
 
 Each platform builds its own bundles; there is no cross-compiling. To start
 Aloft at login, add it to your login items (macOS), autostart (Linux) or
-startup apps (Windows); on a Mac running Flokque, its install script
-does that with a launchd agent.
+startup apps (Windows).
 
 ## License
 
