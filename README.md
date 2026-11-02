@@ -5,6 +5,8 @@ working with its lid closed, so long-running work (coding agents, builds,
 downloads) carries on in a bag. Flip **Keep aloft with lid closed** in its
 panel, or in its tray menu.
 
+<p align="center"><img src="docs/screenshot.png" width="370" alt="The Flokque Aloft panel keeping a Mac awake with the lid closed: its virtual display is on, the lid is open and the battery is at 84%"></p>
+
 - **macOS** (14+) sets `pmset -a disablesleep 1`, holds an idle-sleep
   assertion, and adds a 1920×1080 virtual display that mirrors the screen (so
   no window opens on it). The first time, macOS asks for an administrator
