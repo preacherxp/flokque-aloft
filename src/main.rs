@@ -2,6 +2,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod flokque;
+#[cfg(target_os = "macos")]
+mod menu_bar_check;
 mod power;
 mod settings;
 
@@ -134,6 +136,16 @@ fn refresh(app: &AppHandle) {
         .unwrap_or_else(|poisoned| poisoned.into_inner());
     if *shown_on != Some(view.on) {
         let _ = tray.icon.set_icon(Some(tray_icon(view.on)));
+        #[cfg(target_os = "macos")]
+        {
+            let _ = tray.icon.set_icon_as_template(true);
+            let on = view.on;
+            let _ = tray.icon.with_inner_tray_icon(move |inner| {
+                if let Some(item) = inner.ns_status_item() {
+                    menu_bar_check::show(&item, on);
+                }
+            });
+        }
         *shown_on = Some(view.on);
     }
     let _ = app.emit_to(PANEL, "state", view);
@@ -197,13 +209,15 @@ fn unsafe_to_stay_awake(readings: &power::Readings, min_battery: u8) -> Option<S
     }
 }
 
-/// The app icon, with a green check while on. In colour on every platform,
-/// macOS menu bar included.
+/// On macOS, two rising arrows as a template image, which macOS colours for the
+/// menu bar, with menu_bar_check adding the green check while on. Elsewhere,
+/// the colour app icon with the check drawn in.
 fn tray_icon(on: bool) -> Image<'static> {
-    let png: &[u8] = if on {
-        include_bytes!("../icons/tray-on.png")
-    } else {
-        include_bytes!("../icons/tray-off.png")
+    let png: &[u8] = match (cfg!(target_os = "macos"), on) {
+        (true, true) => include_bytes!("../icons/menu-bar-on.png"),
+        (true, false) => include_bytes!("../icons/menu-bar-off.png"),
+        (false, true) => include_bytes!("../icons/tray-on.png"),
+        (false, false) => include_bytes!("../icons/tray-off.png"),
     };
     Image::from_bytes(png).expect("tray icons are PNGs")
 }
@@ -403,6 +417,7 @@ fn main() {
             )?;
             let icon = TrayIconBuilder::with_id(TRAY)
                 .icon(tray_icon(false))
+                .icon_as_template(cfg!(target_os = "macos"))
                 .tooltip("Flokque Aloft")
                 .menu(&menu)
                 // Left click opens the panel and right click the menu; Linux trays only show the menu.
@@ -516,9 +531,13 @@ mod tests {
     }
 
     #[test]
-    fn shows_the_check_only_while_on() {
-        for on in [false, true] {
-            let icon = tray_icon(on);
+    fn draws_the_check_into_the_colour_icon_only_while_on() {
+        let icons: [&[u8]; 2] = [
+            include_bytes!("../icons/tray-off.png"),
+            include_bytes!("../icons/tray-on.png"),
+        ];
+        for (png, on) in icons.into_iter().zip([false, true]) {
+            let icon = Image::from_bytes(png).unwrap();
             let pixel =
                 |x: u32, y: u32| icon.rgba()[((y * icon.width() + x) * 4) as usize..][..4].to_vec();
             assert_eq!(pixel(0, 0)[3], 0, "the corner is clear");
