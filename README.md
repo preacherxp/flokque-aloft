@@ -22,8 +22,9 @@ Quitting restores sleep. Aloft turns itself off when the computer overheats
 (macOS and Linux) or, on battery, drops below 20%. The lid state shows where
 the system reports it (macOS and Linux).
 
-When Flokque, a server that runs coding agents, is on the same computer, the panel also shows
-whether it's online and how many agents it's running.
+When Flokque, a server that runs coding agents, is running on the same computer,
+the panel also shows it and how many agents it's running, and on a Mac
+**Open Flokque** opens the Flokque app. Without it, neither shows.
 
 ## Settings
 

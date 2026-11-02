@@ -33,8 +33,6 @@ struct Aloft {
     problem: Option<String>,
     readings: power::Readings,
     flokque: Option<flokque::Health>,
-    /// Flokque answered since Aloft started, so going quiet means it's offline.
-    flokque_seen: bool,
 }
 
 struct Tray {
@@ -53,11 +51,11 @@ struct View {
     on: bool,
     detail: String,
     problem: bool,
-    /// "online" or "offline"; None when Flokque hasn't answered since Aloft started.
-    flokque: Option<&'static str>,
+    /// Agents Flokque is running; None while no Flokque answers here.
     agents: Option<u32>,
     lid: Option<&'static str>,
     power: String,
+    can_open_flokque: bool,
 }
 
 impl Aloft {
@@ -71,11 +69,6 @@ impl Aloft {
             on: self.hold.is_some(),
             detail,
             problem: self.problem.is_some(),
-            flokque: match (&self.flokque, self.flokque_seen) {
-                (Some(_), _) => Some("online"),
-                (None, true) => Some("offline"),
-                (None, false) => None,
-            },
             agents: self.flokque.as_ref().map(|health| health.active_sessions),
             lid: self
                 .readings
@@ -93,6 +86,8 @@ impl Aloft {
                 ),
                 None => "Plugged in".into(),
             },
+            // Opens the Flokque app, which only Macs have.
+            can_open_flokque: cfg!(target_os = "macos") && self.flokque.is_some(),
         }
     }
 }
@@ -179,7 +174,6 @@ fn check(
     let stopped = {
         let mut aloft = aloft(app);
         aloft.readings = readings;
-        aloft.flokque_seen |= health.is_some();
         aloft.flokque = health;
         match unsafe_to_stay_awake(&readings, min_battery) {
             Some(reason) if aloft.hold.is_some() => {
@@ -415,6 +409,15 @@ fn set_on(app: AppHandle, on: bool) {
 }
 
 #[tauri::command]
+fn open_flokque(app: AppHandle) {
+    #[cfg(target_os = "macos")]
+    let _ = std::process::Command::new("/usr/bin/open")
+        .arg("flokque://")
+        .spawn();
+    hide_panel(&app);
+}
+
+#[tauri::command]
 fn hide(app: AppHandle) {
     hide_panel(&app);
 }
@@ -442,7 +445,13 @@ fn quit_on_signals(_app: AppHandle) {}
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![state, set_on, hide, quit])
+        .invoke_handler(tauri::generate_handler![
+            state,
+            set_on,
+            open_flokque,
+            hide,
+            quit
+        ])
         .setup(|app| {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
@@ -456,7 +465,6 @@ fn main() {
                 problem: None,
                 readings: power::Readings::default(),
                 flokque: None,
-                flokque_seen: false,
             }));
             app.manage(PanelHiddenAt(Mutex::new(None)));
 
