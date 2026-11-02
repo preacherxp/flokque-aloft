@@ -1,4 +1,5 @@
 const {
+  app: { getVersion },
   core: { invoke },
   event: { listen },
   window: { getCurrentWindow, LogicalSize },
@@ -14,6 +15,17 @@ function pill(text, tone) {
   element.style.setProperty("--tone", `var(--${tone})`);
 
   return element;
+}
+
+/** The window is as tall as the page it shows. */
+function fit() {
+  getCurrentWindow().setSize(new LogicalSize(290, document.querySelector(".panel").offsetHeight));
+}
+
+function show(page) {
+  byId("home").hidden = page !== "home";
+  byId("about").hidden = page !== "about";
+  fit();
 }
 
 function render(view) {
@@ -39,7 +51,7 @@ function render(view) {
   byId("power").textContent = view.power;
   byId("open").hidden = !view.canOpenFlokque;
 
-  getCurrentWindow().setSize(new LogicalSize(290, document.querySelector(".panel").offsetHeight));
+  fit();
 }
 
 byId("keep").addEventListener("change", (event) => {
@@ -51,12 +63,32 @@ byId("keep").addEventListener("change", (event) => {
 
 byId("open").addEventListener("click", () => invoke("open_flokque"));
 
+byId("show-about").addEventListener("click", () => show("about"));
+
 byId("quit").addEventListener("click", () => invoke("quit"));
 
+byId("source").addEventListener("click", () => invoke("open_link", { link: "source" }));
+
+byId("coffee").addEventListener("click", () => invoke("open_link", { link: "coffee" }));
+
+byId("back").addEventListener("click", () => show("home"));
+
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") invoke("hide");
+  if (event.key !== "Escape") return;
+
+  if (byId("about").hidden) invoke("hide");
+  else show("home");
 });
+
+// The panel hides when it loses focus, and opens on its main page next time.
+window.addEventListener("blur", () => show("home"));
 
 listen("state", (event) => render(event.payload));
 
+listen("page", (event) => show(event.payload));
+
 invoke("state").then(render);
+
+getVersion().then((version) => {
+  byId("version").textContent = `Version ${version}`;
+});

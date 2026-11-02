@@ -60,3 +60,9 @@ Each platform builds its own bundles; there is no cross-compiling. To start
 Aloft at login, add it to your login items (macOS), autostart (Linux) or
 startup apps (Windows); on a Mac running Flokque, its install script
 does that with a launchd agent.
+
+## License
+
+[MIT](LICENSE)
+
+<sub>If it keeps your work running with the lid closed, you can [buy me a coffee](https://buymeacoffee.com/michal.hachula).</sub>

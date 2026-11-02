@@ -8,40 +8,63 @@
   </head>
   <body>
     <main class="panel">
-      <header>
-        <span class="bird" id="bird">
-          <img class="glyph" src="bird-off.png" alt="" />
-          <img class="check" src="check.png" alt="" />
-        </span>
-        <div>
+      <div class="page" id="home">
+        <header>
+          <span class="bird" id="bird">
+            <img class="glyph" src="bird-off.png" alt="" />
+            <img class="check" src="check.png" alt="" />
+          </span>
+          <div>
+            <h1>Flokque Aloft</h1>
+            <p class="sub" id="sub"></p>
+          </div>
+        </header>
+
+        <section class="keep">
+          <div>
+            <h2 id="keep-label">Keep aloft with lid closed</h2>
+            <p id="detail"></p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="keep" role="switch" aria-labelledby="keep-label" />
+            <span></span>
+          </label>
+        </section>
+
+        <dl>
+          <div id="agents-line"><dt>Agents</dt><dd id="agents"></dd></div>
+          <div id="lid-line"><dt>Lid</dt><dd id="lid"></dd></div>
+          <div><dt>Power</dt><dd id="power"></dd></div>
+        </dl>
+
+        <hr />
+
+        <nav>
+          <button type="button" id="open">Open Flokque</button>
+          <button type="button" id="show-about">About Flokque Aloft</button>
+          <button type="button" id="quit">Quit Flokque Aloft</button>
+        </nav>
+      </div>
+
+      <div class="page" id="about" hidden>
+        <div class="about">
+          <img src="app-icon.png" alt="" width="64" height="64" />
           <h1>Flokque Aloft</h1>
-          <p class="sub" id="sub"></p>
+          <p class="sub" id="version"></p>
+          <p>Keeps your computer working with the lid closed, so long-running work carries on in a bag.</p>
+          <p class="links">
+            <button type="button" class="link" id="source">Source on GitHub</button>
+            <span aria-hidden="true">·</span>
+            <button type="button" class="link" id="coffee">Buy me a coffee</button>
+          </p>
         </div>
-      </header>
 
-      <section class="keep">
-        <div>
-          <h2 id="keep-label">Keep aloft with lid closed</h2>
-          <p id="detail"></p>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="keep" role="switch" aria-labelledby="keep-label" />
-          <span></span>
-        </label>
-      </section>
+        <hr />
 
-      <dl>
-        <div id="agents-line"><dt>Agents</dt><dd id="agents"></dd></div>
-        <div id="lid-line"><dt>Lid</dt><dd id="lid"></dd></div>
-        <div><dt>Power</dt><dd id="power"></dd></div>
-      </dl>
-
-      <hr />
-
-      <nav>
-        <button type="button" id="open">Open Flokque</button>
-        <button type="button" id="quit">Quit Flokque Aloft</button>
-      </nav>
+        <nav>
+          <button type="button" id="back">Back</button>
+        </nav>
+      </div>
     </main>
   </body>
 </html>

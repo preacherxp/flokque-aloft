@@ -417,6 +417,25 @@ fn open_flokque(app: AppHandle) {
     hide_panel(&app);
 }
 
+/// Opens one of the About page's links in the browser.
+#[tauri::command]
+fn open_link(app: AppHandle, link: String) {
+    let url = match link.as_str() {
+        "source" => "https://github.com/preacherxp/flokque-aloft",
+        "coffee" => "https://buymeacoffee.com/michal.hachula",
+        _ => return,
+    };
+    let opener = if cfg!(target_os = "macos") {
+        "/usr/bin/open"
+    } else if cfg!(windows) {
+        "explorer"
+    } else {
+        "xdg-open"
+    };
+    let _ = std::process::Command::new(opener).arg(url).spawn();
+    hide_panel(&app);
+}
+
 #[tauri::command]
 fn hide(app: AppHandle) {
     hide_panel(&app);
@@ -449,6 +468,7 @@ fn main() {
             state,
             set_on,
             open_flokque,
+            open_link,
             hide,
             quit
         ])
@@ -482,6 +502,7 @@ fn main() {
                     &keep,
                     &MenuItem::with_id(app, "show", "Show Flokque Aloft", true, None::<&str>)?,
                     &PredefinedMenuItem::separator(app)?,
+                    &MenuItem::with_id(app, "about", "About Flokque Aloft", true, None::<&str>)?,
                     &MenuItem::with_id(app, "quit", "Quit Flokque Aloft", true, None::<&str>)?,
                 ],
             )?;
@@ -497,7 +518,13 @@ fn main() {
                         let on = aloft(app).hold.is_some();
                         set(app, !on);
                     }
-                    "show" => {
+                    "show" | "about" => {
+                        let page = if event.id().as_ref() == "about" {
+                            "about"
+                        } else {
+                            "home"
+                        };
+                        let _ = app.emit_to(PANEL, "page", page);
                         let anchor = app
                             .tray_by_id(TRAY)
                             .and_then(|tray| tray.rect().ok().flatten());

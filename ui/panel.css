@@ -46,9 +46,6 @@ body {
 }
 
 .panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   padding: 14px;
   background: var(--background);
   border: 1px solid var(--border);
@@ -253,5 +250,50 @@ nav button {
 nav button:hover,
 nav button:focus-visible {
   background: var(--hover);
+  outline: none;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px 0;
+  text-align: center;
+}
+
+.about img {
+  margin-bottom: 6px;
+}
+
+.about .sub {
+  margin: 0 0 6px;
+}
+
+.links {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  font: inherit;
+  color: var(--primary);
+  background: none;
+  cursor: pointer;
+}
+
+.link:hover,
+.link:focus-visible {
+  text-decoration: underline;
   outline: none;
 }
