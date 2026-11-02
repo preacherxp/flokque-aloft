@@ -58,42 +58,6 @@ header {
   gap: 10px;
 }
 
-/* The tray's bird, perched or flying with a check, on the teal tile the Linux and Windows trays show. */
-.bird {
-  position: relative;
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--primary);
-}
-
-.glyph {
-  width: 20px;
-}
-
-/* The bird is black: white on the light theme's dark teal. */
-@media (prefers-color-scheme: light) {
-  .glyph {
-    filter: invert(1);
-  }
-}
-
-.check {
-  position: absolute;
-  right: -3px;
-  bottom: -3px;
-  width: 13px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--background);
-}
-
-.bird:not(.on) .check {
-  display: none;
-}
-
 h1 {
   font-size: 13px;
   font-weight: 600;

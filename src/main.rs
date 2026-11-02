@@ -2,8 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod flokque;
-#[cfg(target_os = "macos")]
-mod menu_bar_check;
 mod power;
 mod settings;
 
@@ -136,16 +134,6 @@ fn refresh(app: &AppHandle) {
         .unwrap_or_else(|poisoned| poisoned.into_inner());
     if *shown_on != Some(view.on) {
         let _ = tray.icon.set_icon(Some(tray_icon(view.on)));
-        #[cfg(target_os = "macos")]
-        {
-            let _ = tray.icon.set_icon_as_template(true);
-            let on = view.on;
-            let _ = tray.icon.with_inner_tray_icon(move |inner| {
-                if let Some(item) = inner.ns_status_item() {
-                    menu_bar_check::show(&item, on);
-                }
-            });
-        }
         *shown_on = Some(view.on);
     }
     let _ = app.emit_to(PANEL, "state", view);
@@ -209,108 +197,15 @@ fn unsafe_to_stay_awake(readings: &power::Readings, min_battery: u8) -> Option<S
     }
 }
 
-/// The tray's bird: perched, or flying with a green check while on.
+/// The app icon, with a green check while on. In colour on every platform,
+/// macOS menu bar included.
 fn tray_icon(on: bool) -> Image<'static> {
     let png: &[u8] = if on {
         include_bytes!("../icons/tray-on.png")
     } else {
         include_bytes!("../icons/tray-off.png")
     };
-    let bird = Image::from_bytes(png).expect("tray icons are PNGs");
-    // A template image, which macOS colours for the menu bar; menu_bar_check
-    // puts the check in a gap cut out of the bird's bottom right.
-    #[cfg(target_os = "macos")]
-    {
-        if !on {
-            return bird;
-        }
-        // tray-icon shows the bird 18 points tall.
-        let per_point = f64::from(bird.height()) / 18.0;
-        let radius = menu_bar_check::SIZE / 2.0 * per_point;
-        let (width, height) = (f64::from(bird.width()), f64::from(bird.height()));
-        let gap = (
-            width - radius,
-            height - radius,
-            radius + menu_bar_check::GAP * per_point,
-        );
-        let mut rgba = bird.rgba().to_vec();
-        for (i, pixel) in rgba.as_chunks_mut::<4>().0.iter_mut().enumerate() {
-            let (x, y) = (i as u32 % bird.width(), i as u32 / bird.width());
-            if within(x, y, gap) {
-                pixel[3] = 0;
-            }
-        }
-        Image::new_owned(rgba, bird.width(), bird.height())
-    }
-    #[cfg(not(target_os = "macos"))]
-    tile(&bird, on)
-}
-
-/// Whether a pixel's centre lies in a circle (centre x, centre y, radius).
-fn within(x: u32, y: u32, (cx, cy, radius): (f64, f64, f64)) -> bool {
-    let (dx, dy) = (f64::from(x) + 0.5 - cx, f64::from(y) + 0.5 - cy);
-    dx * dx + dy * dy <= radius * radius
-}
-
-/// Trays elsewhere can be light or dark: a white bird on a Flokque-teal tile
-/// shows on both, with the check in its bottom right corner while on.
-#[cfg_attr(target_os = "macos", allow(dead_code))]
-fn tile(bird: &Image, on: bool) -> Image<'static> {
-    const SIZE: u32 = 72;
-    const RADIUS: f64 = 16.0;
-    const TEAL: [u8; 3] = [0x1f, 0x5a, 0x6b];
-    const WHITE: [u8; 3] = [0xff, 0xff, 0xff];
-    let check = Image::from_bytes(include_bytes!("../icons/check.png")).expect("check is a PNG");
-    // Centred on the bottom right corner's curve, with a teal ring parting it from the bird.
-    let check_at = SIZE - RADIUS as u32 - check.width() / 2;
-    let corner = f64::from(SIZE) - RADIUS;
-    let ring = (corner, corner, f64::from(check.width()) / 2.0 + 3.0);
-    let bird_at = ((SIZE - bird.width()) / 2, (SIZE - bird.height()) / 2);
-    let mut rgba = vec![0u8; (SIZE * SIZE * 4) as usize];
-    for y in 0..SIZE {
-        for x in 0..SIZE {
-            let (cx, cy) = (f64::from(x) + 0.5, f64::from(y) + 0.5);
-            let dx = (RADIUS - cx).max(cx - corner).max(0.0);
-            let dy = (RADIUS - cy).max(cy - corner).max(0.0);
-            if dx * dx + dy * dy > RADIUS * RADIUS {
-                continue;
-            }
-            let mut pixel = TEAL.map(f64::from);
-            let mut over = |color: [u8; 3], alpha: u8| {
-                let a = f64::from(alpha) / 255.0;
-                for (value, color) in pixel.iter_mut().zip(color) {
-                    *value = *value * (1.0 - a) + f64::from(color) * a;
-                }
-            };
-            if !(on && within(x, y, ring)) {
-                if let Some(bird) = sample(bird, x, y, bird_at) {
-                    over(WHITE, bird[3]);
-                }
-            }
-            if on {
-                if let Some(check) = sample(&check, x, y, (check_at, check_at)) {
-                    over([check[0], check[1], check[2]], check[3]);
-                }
-            }
-            let i = ((y * SIZE + x) * 4) as usize;
-            for (c, value) in pixel.iter().enumerate() {
-                rgba[i + c] = value.round() as u8;
-            }
-            rgba[i + 3] = 255;
-        }
-    }
-    Image::new_owned(rgba, SIZE, SIZE)
-}
-
-/// The image's pixel under (x, y) when it's drawn at `at`.
-#[cfg_attr(target_os = "macos", allow(dead_code))]
-fn sample(image: &Image, x: u32, y: u32, (left, top): (u32, u32)) -> Option<[u8; 4]> {
-    let (x, y) = (x.checked_sub(left)?, y.checked_sub(top)?);
-    if x >= image.width() || y >= image.height() {
-        return None;
-    }
-    let i = ((y * image.width() + x) * 4) as usize;
-    image.rgba()[i..i + 4].try_into().ok()
+    Image::from_bytes(png).expect("tray icons are PNGs")
 }
 
 /// Under the tray icon at the top of the screen, above it at the bottom, or top
@@ -508,7 +403,6 @@ fn main() {
             )?;
             let icon = TrayIconBuilder::with_id(TRAY)
                 .icon(tray_icon(false))
-                .icon_as_template(cfg!(target_os = "macos"))
                 .tooltip("Flokque Aloft")
                 .menu(&menu)
                 // Left click opens the panel and right click the menu; Linux trays only show the menu.
@@ -622,14 +516,12 @@ mod tests {
     }
 
     #[test]
-    fn tiles_the_bird_with_rounded_corners_and_a_check_while_on() {
-        let bird = Image::from_bytes(include_bytes!("../icons/tray-on.png")).unwrap();
+    fn shows_the_check_only_while_on() {
         for on in [false, true] {
-            let tile = tile(&bird, on);
+            let icon = tray_icon(on);
             let pixel =
-                |x: u32, y: u32| tile.rgba()[((y * tile.width() + x) * 4) as usize..][..4].to_vec();
-            assert_eq!(pixel(0, 0)[3], 0, "the corner is cut");
-            assert_eq!(pixel(36, 2), [0x1f, 0x5a, 0x6b, 255], "the tile is teal");
+                |x: u32, y: u32| icon.rgba()[((y * icon.width() + x) * 4) as usize..][..4].to_vec();
+            assert_eq!(pixel(0, 0)[3], 0, "the corner is clear");
             // The left of the check's disc, clear of its tick.
             let [red, green, ..] = pixel(46, 56)[..] else {
                 unreachable!()

@@ -20,8 +20,7 @@ signal-hook = "0.3"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
-objc2-foundation = { version = "0.3", features = ["NSArray", "NSData", "NSGeometry", "NSProcessInfo", "NSString"] }
-objc2-app-kit = { version = "0.3", features = ["NSButton", "NSCell", "NSControl", "NSGraphics", "NSImage", "NSImageView", "NSResponder", "NSStatusBarButton", "NSStatusItem", "NSView"] }
+objc2-foundation = { version = "0.3", features = ["NSArray", "NSGeometry", "NSProcessInfo", "NSString"] }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_System_Power", "Win32_System_Registry"] }

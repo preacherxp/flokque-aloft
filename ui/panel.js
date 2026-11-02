@@ -38,8 +38,7 @@ function render(view) {
     byId("sub").replaceChildren("Keeps working with the lid closed");
   }
 
-  byId("bird").classList.toggle("on", view.on);
-  byId("bird").querySelector(".glyph").src = view.on ? "bird-on.png" : "bird-off.png";
+  byId("icon").src = view.on ? "icon-on.png" : "icon-off.png";
   byId("keep").checked = view.on;
   byId("detail").textContent = view.detail;
   byId("detail").classList.toggle("problem", view.problem);
