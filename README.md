@@ -1,5 +1,7 @@
 # Flokque Aloft
 
+<p align="center"><a href="https://preacherxp.github.io/30-days-of-tools/"><img src="https://img.shields.io/badge/30_days_of_tools-day_2_of_30-e8492f" alt="Day 2 of 30 days of tools, a tool building challenge"></a></p>
+
 <p align="center"><a href="https://buymeacoffee.com/michal.hachula"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" height="41"></a></p>
 
 A menu bar and tray app for macOS, Linux and Windows that keeps your computer
