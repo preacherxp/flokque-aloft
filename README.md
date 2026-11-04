@@ -1,5 +1,7 @@
 # Flokque Aloft
 
+<p align="center"><a href="https://buymeacoffee.com/michal.hachula"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" height="41"></a></p>
+
 A menu bar and tray app for macOS, Linux and Windows that keeps your computer
 working with its lid closed, so long-running work (coding agents, builds,
 downloads) carries on in a bag. Flip **Keep aloft with lid closed** in its
